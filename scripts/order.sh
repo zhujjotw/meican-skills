@@ -42,7 +42,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         exit 1
     fi
 
-    local action="${1:-status}"
+    action="${1:-status}"
 
     case "$action" in
         status)

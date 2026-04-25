@@ -47,7 +47,7 @@ except:
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    local cmd="${1:-help}"
+    cmd="${1:-help}"
 
     case "$cmd" in
         set)
