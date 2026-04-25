@@ -1,42 +1,59 @@
 ---
 name: meican
-description: 美餐自动点餐，历史查询，健康推荐
+description: 美餐自动点餐、历史查询、健康推荐、习惯学习
 license: MIT
 compatibility: opencode
 ---
 
+美餐企业订餐平台的 AI 接入 skill。登录后可以查菜单、下单、看历史、做健康推荐，并且持续学习用户习惯。
+
+调用此 skill 后，先确认用户是否已登录（检查 MEICAN_USERNAME+MEICAN_PASSWORD 环境变量），未登录则提示用户设置。
+
 ## Capabilities
 
 ### 登录认证
-- 通过 `scripts/login.sh` 使用账号密码登录
-- 使用 `POST /account/directlogin` 进行 Cookie-based Session 认证
-- Cookie 自动持久化，后续 API 调用复用
+登录美餐并持久化 Cookie。
+
+- `scripts/login.sh` — 账号密码登录，Cookie 自动持久化
+- POST `/account/directlogin` — Cookie-based Session 认证
 
 ### 菜单查询
-- 获取排期日历：`GET /preorder/api/v2.1/calendarItems/list`
-- 获取餐厅列表：`GET /preorder/api/v2.1/restaurants/list`
-- 获取菜品详情：`GET /preorder/api/v2.1/restaurants/show`
+查询排期、餐厅和菜品。
 
-### 自动点餐
-- 按菜品 ID 提交订单：`POST /preorder/api/v2.1/orders/add`
-- 今日订单状态查询
-- 默认只预览，需人类确认后才执行
+- `scripts/menu.sh` — 查排期日历 / 餐厅列表 / 菜品详情
+- `GET /preorder/api/v2.1/calendarItems/list`
+- `GET /preorder/api/v2.1/restaurants/list`
+- `GET /preorder/api/v2.1/restaurants/show`
 
 ### 历史分析
-- 拉取历史订单记录
-- 汇总统计消费数据
+查看历史订单和消费统计。
+
+- `scripts/history.sh summary` — 过去 30 天订单汇总
+- `scripts/history.sh date YYYY-MM-DD` — 查某天订单
+- 数据来自 `calendarItems` 的 `corpOrderUser` 字段
+
+### 自动点餐
+下单和订单状态。
+
+- `scripts/order.sh status` — 今日订单状态
+- `scripts/order.sh order <dish_id> <tab_id> <target_time>` — 下单
+- ⚠️ 下单前必须人类确认，禁止自动执行
 
 ### 健康推荐
-- 录入健康约束（低卡、低脂、过敏源等）
-- 根据约束+今日菜单生成推荐
+录入健康约束并生成推荐。
 
-## Workflow
+- `scripts/health.sh set '{"max_calories": 600}'` — 设置约束
+- `scripts/health.sh recommend` — 基于今日菜单推荐
+- `scripts/health.sh goals` — 查看当前约束
 
-1. 登录 → `scripts/login.sh`（需先设置 MEICAN_USERNAME + MEICAN_PASSWORD）
-2. 查菜单 → `scripts/menu.sh`（排期 → 餐厅 → 菜品）
-3. 下单 → `scripts/order.sh order <dish_id> <tab_id> <target_time>`
-4. 分析 → `scripts/history.sh summary`
-5. 健康 → `scripts/health.sh recommend`
+### 习惯学习
+持续学习用户偏好，越用越准。
+
+- `scripts/learn.sh from-history` — 从历史订单自动学习
+- `scripts/learn.sh prefer dish="牛肉"` — 手动录入偏好
+- `scripts/learn.sh avoid dish="猪肉"` — 手动录入禁忌
+- `scripts/learn.sh show` — 查看当前学习结果
+- 存储于 `profile/habits.json`，可读可改
 
 ## Environment
 
@@ -44,26 +61,8 @@ compatibility: opencode
 |---|---|---|
 | MEICAN_USERNAME | 美餐账号（邮箱/手机号） | Yes |
 | MEICAN_PASSWORD | 美餐密码 | Yes |
-| MEICAN_COOKIE_FILE | Cookie 文件路径 | No |
-| MEICAN_HEALTH_FILE | 健康目标配置路径 | No |
+| MEICAN_COOKIE_FILE | Cookie 文件路径，默认 /tmp/meican_cookie.txt | No |
 
-## Auth API Reference
+## Security
 
-```
-POST https://meican.com/account/directlogin
-Content-Type: application/x-www-form-urlencoded
-
-username=<email>&password=<pwd>&loginType=username&remember=true
-```
-
-## Menu API Reference
-
-```
-GET /preorder/api/v2.1/calendarItems/list
-GET /preorder/api/v2.1/restaurants/list?tabUniqueId=<id>&targetTime=<ts>
-GET /preorder/api/v2.1/restaurants/show?restaurantUniqueId=<id>&tabUniqueId=<id>&targetTime=<ts>
-POST /preorder/api/v2.1/orders/add
-    order=[{"count":"1","dishId":"<id>"}]
-    tabUniqueId=<id>
-    targetTime=<ts>
-```
+所有凭证通过环境变量传递，禁止在任何文件、prompt、脚本、命令参数中硬编码密码。
