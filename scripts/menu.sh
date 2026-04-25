@@ -13,7 +13,11 @@ api_get() {
 
 get_calendar() {
     echo "=== 获取排期日历 ==="
-    api_get "/preorder/api/v2.1/calendarItems/list?noHttpGetCache=$(date +%s%3N)"
+    local today
+    today=$(date +%Y-%m-%d)
+    local next_week
+    next_week=$(date -v+7d +%Y-%m-%d 2>/dev/null || date -d "+7 days" +%Y-%m-%d 2>/dev/null)
+    api_get "/preorder/api/v2.1/calendarItems/list?beginDate=${today}&endDate=${next_week}&withOrderDetail=false&noHttpGetCache=$(date +%s%3N)"
 }
 
 get_restaurants() {
@@ -37,9 +41,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         exit 1
     fi
 
-    local tab_id="${1:-}"
-    local target_time="${2:-}"
-    local restaurant_id="${3:-}"
+    tab_id="${1:-}"
+    target_time="${2:-}"
+    restaurant_id="${3:-}"
 
     if [[ -n "$restaurant_id" ]]; then
         get_dishes "$restaurant_id" "$tab_id" "$target_time"
