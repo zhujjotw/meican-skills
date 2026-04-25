@@ -112,8 +112,6 @@ meican-skills/
 - **认证**: `POST /account/directlogin` — Cookie-based Session
 - **菜单**: `GET /preorder/api/v2.1/calendarItems/list`
 - **下单**: `POST /preorder/api/v2.1/orders/add`
-- **数据源**: 美餐网页端抓包 + [LKI/meican](https://github.com/LKI/meican) Python SDK 参考
-
 ---
 
 ## 安全
