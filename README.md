@@ -1,6 +1,6 @@
 # 🍱 美餐自动点餐 Skill
 
-![美餐自动点餐](Gemini_Generated_Image_2k2d4z2k2d4z2k2d.png)
+![美餐自动点餐](meican-hero.png)
 
 **美餐企业订餐的 AI 智能体接入 skill。点餐、查历史、健康推荐、习惯学习，全自动。**
 
