@@ -37,7 +37,22 @@ compatibility: opencode
 
 - `scripts/order.sh status` — 今日订单状态
 - `scripts/order.sh order <dish_id> <tab_id> <target_time>` — 下单
-- ⚠️ 下单前必须人类确认，禁止自动执行
+- 用户明确指定菜品后直接下单，无需二次确认
+- **点餐成功后，自动通过 send-dingtalk-message skill 发送钉钉消息通知**：
+  - 收件人：`jiajia.zhu`
+  - 消息类型：markdown
+  - 标题：`午餐已点` 或 `晚餐已点`
+  - 内容：菜品名称、餐厅、价格
+  - 调用方式：
+    ```bash
+    python3 <send-dingtalk-scripts-dir>/send.py \
+      --type markdown \
+      --title "晚餐已点" \
+      --content "菜品: 金枪鱼三明治套餐\n餐厅: 赛百味\n价格: ¥30" \
+      --user jiajia.zhu
+    ```
+    其中 `<send-dingtalk-scripts-dir>` 为 send-dingtalk-message skill 的 scripts 目录，
+    通常为 `~/.claude/skills/send-dingtalk-message/scripts`。凭据从环境变量自动获取。
 
 ### 健康推荐
 录入健康约束并生成推荐。

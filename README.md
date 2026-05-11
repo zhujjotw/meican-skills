@@ -8,6 +8,16 @@
 
 ## 特色
 
+### 🤖 智能自动点餐
+全新引入自动点餐功能，基于历史习惯智能推荐菜品并自动下单。
+
+```
+# 设置每天上午10点自动点餐
+# 支持基于历史偏好的智能推荐
+# 自动发送钉钉通知点餐结果
+bash scripts/auto-order.sh
+```
+
 ### 🧠 习惯越用越聪明
 不是死板地调 API。每次下单都是学习机会——自动记录你爱吃什么、不吃什么、在哪吃、花多少。用得越久，推荐越准。
 
@@ -68,6 +78,46 @@ bash scripts/history.sh summary
 bash scripts/learn.sh from-history
 ```
 
+## 🤖 智能自动点餐
+
+### 功能特性
+- **🧠 历史习惯学习** - 自动分析您的历史订单，学习口味偏好
+- **⚡ 智能推荐算法** - 多维度评分系统（价格、口味、套餐类型）
+- **📱 钉钉通知** - 点餐成功后自动发送通知到钉钉
+- **🔄 定时执行** - 支持cron定时任务，每天自动点餐
+
+### 推荐评分机制
+- **价格匹配** (40分) - 符合您的价格偏好
+- **口味偏好** (40分) - 包含您喜欢的菜品类型
+- **套餐类型** (20分) - 优选套餐类型
+- **配菜加分** (10分) - 配饮品/小菜/时蔬
+
+### 使用方法
+
+#### 手动测试
+```bash
+# 设置环境变量
+export MEICAN_USERNAME="your@email.com"
+export MEICAN_PASSWORD="your_password"
+
+# 执行自动点餐
+bash scripts/auto-order.sh
+```
+
+#### 设置定时任务
+```bash
+# 使用cron每天上午10点自动点餐
+0 10 * * * bash /path/to/meican-skills/scripts/auto-order.sh
+```
+
+### 钉钉通知配置
+自动点餐成功后会发送钉钉通知，包含：
+- 菜品名称和价格
+- AI推荐评分
+- 推荐理由
+
+确保已安装 `send-dingtalk-message` skill 并配置好钉钉凭据。
+
 ---
 
 ## 目录结构
@@ -79,11 +129,14 @@ meican-skills/
     login.sh            # 登录认证
     menu.sh             # 排期 → 餐厅 → 菜品
     order.sh            # 下单 + 订单状态
+    auto-order.sh       # 智能自动点餐（NEW!）
     history.sh          # 历史订单 + 消费统计
     health.sh           # 健康约束 + 推荐
     learn.sh            # 习惯学习系统
+    verify.sh           # 功能验证
   profile/
     habits.json         # 习惯数据库（持续学习）
+    habits.json.example # 习惯数据模板
   docs/
     usage.md            # 完整使用文档
   tests/
@@ -92,6 +145,7 @@ meican-skills/
     order.txt           # 点餐 prompt
     health.txt          # 健康推荐 prompt
   .env.example          # 环境变量模板
+  .gitignore            # 忽略敏感文件
 ```
 
 ---
@@ -103,6 +157,7 @@ meican-skills/
 | 登录 | `login.sh` | 账号密码 → Cookie-based Session |
 | 菜单 | `menu.sh` | 日历排期 → 餐厅 → 菜品详情 |
 | 下单 | `order.sh` | 提交订单 / 今日订单状态 |
+| **自动点餐** | `auto-order.sh` | **基于历史习惯的智能推荐 + 自动下单 + 钉钉通知** |
 | 历史 | `history.sh` | 过去 30 天 / 指定日期订单 |
 | 健康 | `health.sh` | 录入约束 → 今日菜单推荐 |
 | 学习 | `learn.sh` | 自动学习 + 手动录入偏好 |
