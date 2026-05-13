@@ -167,9 +167,10 @@ fi
 
 echo "Tab ID: $TAB_ID"
 
-# 4. 下单
+# 4. 下单（使用当前时间作为 targetTime）
 echo "正在下单..."
-ORDER_RESULT=$(bash "$SCRIPT_DIR/order.sh" order "$DISH_ID" "$TAB_ID" "evening" 2>&1)
+# 注意：不传递 targetTime 参数，让 order.sh 自动使用当前时间
+ORDER_RESULT=$(bash "$SCRIPT_DIR/order.sh" order "$DISH_ID" "$TAB_ID" 2>&1)
 
 if echo "$ORDER_RESULT" | grep -qiE "(success|成功|订单已提交|USER_RECEIVED)"; then
     echo "✅ 下单成功!"
